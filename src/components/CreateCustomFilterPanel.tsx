@@ -77,19 +77,20 @@ export const CreateCustomFilterPanel: React.FC<CreateCustomFilterPanelProps> = (
     }
   };
   const handleSave = () => {
-    // Validation: Check if at least one filter criteria is filled for templates
+    // Validation for templates: Check if at least one from each group is filled
     if (activeTab === 'templates') {
-      const hasFilterCriteria = selectedDocuments.length > 0 || selectedWorkflows.length > 0 || conditions.length > 0;
-      if (!hasFilterCriteria) {
-        alert('Please fill at least one filter criteria field (Documents, Workflows, or Conditions)');
+      const hasGroup1 = selectedDocuments.length > 0 || selectedWorkflows.length > 0;
+      const hasGroup2 = conditions.length > 0 || targetGroups.length > 0;
+
+      if (!hasGroup1) {
+        alert('Please select at least one from Group 1: Select Documents or Select Workflows');
         return;
       }
-    }
 
-    // Check if target groups are selected
-    if (targetGroups.length === 0) {
-      alert('Please select at least one target group');
-      return;
+      if (!hasGroup2) {
+        alert('Please select at least one from Group 2: Conditions or Target Groups');
+        return;
+      }
     }
 
     onSave();
@@ -116,7 +117,7 @@ export const CreateCustomFilterPanel: React.FC<CreateCustomFilterPanelProps> = (
           {/* Name Field */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Name
+              Name <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -131,7 +132,7 @@ export const CreateCustomFilterPanel: React.FC<CreateCustomFilterPanelProps> = (
           {activeTab === 'templates' && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Filter Type
+                Filter Type <span className="text-red-500">*</span>
               </label>
               <div className="flex space-x-1 bg-gray-100 rounded-lg p-1">
                 <button
@@ -158,161 +159,224 @@ export const CreateCustomFilterPanel: React.FC<CreateCustomFilterPanelProps> = (
             </div>
           )}
 
-          {/* Filter Criteria Group - Only for Templates */}
+          {/* Filter Criteria - Only for Templates */}
           {activeTab === 'templates' && (
-            <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
-              <div className="mb-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-900 mb-3">
+                Filter Criteria <span className="text-red-500">*</span>
+              </label>
+
+              {/* Instructional Helper Text */}
+              <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                 <div className="flex items-start space-x-2">
                   <Info className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
-                  <div>
-                    <label className="block text-sm font-medium text-gray-900 mb-1">
-                      Filter Criteria (at least one required)
-                    </label>
-                    <p className="text-xs text-gray-600">
-                      Fill at least one of the fields below to create a valid filter.
-                    </p>
+                  <div className="text-xs text-blue-900">
+                    <p className="font-medium mb-1">To create a valid filter, select at least one from each group below:</p>
+                    <ul className="space-y-0.5 ml-4 list-disc">
+                      <li><strong>Group 1:</strong> Select Documents or Select Workflows</li>
+                      <li><strong>Group 2:</strong> Conditions or Target Groups</li>
+                    </ul>
                   </div>
                 </div>
               </div>
 
-              <div className="space-y-4">
-                {/* Select Documents */}
-                <div className="relative">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Select Documents
-                  </label>
-                  <button
-                    onClick={() => setShowDocuments(!showDocuments)}
-                    className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors bg-white"
-                  >
-                    <span className="text-gray-500">
-                      {selectedDocuments.length === 0 ? 'Select documents' : `${selectedDocuments.length} document(s) selected`}
-                    </span>
-                    <ChevronDown className="w-4 h-4 text-gray-400" />
-                  </button>
-
-                  <SmartDropdown isOpen={showDocuments} onClose={() => setShowDocuments(false)}>
-                    <div className="p-2">
-                      <div className="py-1">
-                        {availableDocuments.map((document) => (
-                          <button
-                            key={document}
-                            onClick={() => toggleDocument(document)}
-                            className="w-full flex items-center space-x-3 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded transition-colors"
-                          >
-                            <input
-                              type="checkbox"
-                              checked={selectedDocuments.includes(document)}
-                              onChange={() => {}}
-                              className="rounded border-gray-300"
-                            />
-                            <span>{document}</span>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </SmartDropdown>
+              {/* Group 1: Documents or Workflows */}
+              <div className="border border-gray-300 rounded-lg p-4 bg-white mb-4">
+                <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
+                  Group 1: Documents or Workflows (select at least one)
                 </div>
+                <div className="space-y-4">
+                  {/* Select Documents */}
+                  <div className="relative">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Select Documents
+                    </label>
+                    <button
+                      onClick={() => setShowDocuments(!showDocuments)}
+                      className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors bg-white"
+                    >
+                      <span className="text-gray-500">
+                        {selectedDocuments.length === 0 ? 'Select documents' : `${selectedDocuments.length} document(s) selected`}
+                      </span>
+                      <ChevronDown className="w-4 h-4 text-gray-400" />
+                    </button>
 
-                {/* Select Workflows */}
-                <div className="relative">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Select Workflows
-                  </label>
-                  <button
-                    onClick={() => setShowWorkflows(!showWorkflows)}
-                    className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors bg-white"
-                  >
-                    <span className="text-gray-500">
-                      {selectedWorkflows.length === 0 ? 'Select workflows' : `${selectedWorkflows.length} workflow(s) selected`}
-                    </span>
-                    <ChevronDown className="w-4 h-4 text-gray-400" />
-                  </button>
-
-                  <SmartDropdown isOpen={showWorkflows} onClose={() => setShowWorkflows(false)}>
-                    <div className="p-2">
-                      <div className="py-1">
-                        {availableWorkflows.map((workflow) => (
-                          <button
-                            key={workflow}
-                            onClick={() => toggleWorkflow(workflow)}
-                            className="w-full flex items-center space-x-3 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded transition-colors"
-                          >
-                            <input
-                              type="checkbox"
-                              checked={selectedWorkflows.includes(workflow)}
-                              onChange={() => {}}
-                              className="rounded border-gray-300"
-                            />
-                            <span>{workflow}</span>
-                          </button>
-                        ))}
+                    <SmartDropdown isOpen={showDocuments} onClose={() => setShowDocuments(false)}>
+                      <div className="p-2">
+                        <div className="py-1">
+                          {availableDocuments.map((document) => (
+                            <button
+                              key={document}
+                              onClick={() => toggleDocument(document)}
+                              className="w-full flex items-center space-x-3 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded transition-colors"
+                            >
+                              <input
+                                type="checkbox"
+                                checked={selectedDocuments.includes(document)}
+                                onChange={() => {}}
+                                className="rounded border-gray-300"
+                              />
+                              <span>{document}</span>
+                            </button>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  </SmartDropdown>
-                </div>
+                    </SmartDropdown>
+                  </div>
 
-                {/* Conditions */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Conditions
-                  </label>
-                  <button
-                    onClick={() => setShowConditionBuilder(true)}
-                    className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors bg-white"
-                  >
-                    <span className="text-gray-500">
-                      {conditions.length === 0 ? 'Add conditions' : `${conditions.length} condition(s) added`}
-                    </span>
-                    <ChevronDown className="w-4 h-4 text-gray-400" />
-                  </button>
+                  {/* Divider with OR */}
+                  <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                      <div className="w-full border-t border-gray-200"></div>
+                    </div>
+                    <div className="relative flex justify-center">
+                      <span className="px-3 bg-white text-xs font-medium text-gray-400">OR</span>
+                    </div>
+                  </div>
+
+                  {/* Select Workflows */}
+                  <div className="relative">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Select Workflows
+                    </label>
+                    <button
+                      onClick={() => setShowWorkflows(!showWorkflows)}
+                      className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors bg-white"
+                    >
+                      <span className="text-gray-500">
+                        {selectedWorkflows.length === 0 ? 'Select workflows' : `${selectedWorkflows.length} workflow(s) selected`}
+                      </span>
+                      <ChevronDown className="w-4 h-4 text-gray-400" />
+                    </button>
+
+                    <SmartDropdown isOpen={showWorkflows} onClose={() => setShowWorkflows(false)}>
+                      <div className="p-2">
+                        <div className="py-1">
+                          {availableWorkflows.map((workflow) => (
+                            <button
+                              key={workflow}
+                              onClick={() => toggleWorkflow(workflow)}
+                              className="w-full flex items-center space-x-3 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded transition-colors"
+                            >
+                              <input
+                                type="checkbox"
+                                checked={selectedWorkflows.includes(workflow)}
+                                onChange={() => {}}
+                                className="rounded border-gray-300"
+                              />
+                              <span>{workflow}</span>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </SmartDropdown>
+                  </div>
+                </div>
+              </div>
+
+              {/* Group 2: Conditions or Target Groups */}
+              <div className="border border-gray-300 rounded-lg p-4 bg-white">
+                <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
+                  Group 2: Conditions or Target Groups (select at least one)
+                </div>
+                <div className="space-y-4">
+                  {/* Conditions */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Conditions
+                    </label>
+                    <button
+                      onClick={() => setShowConditionBuilder(true)}
+                      className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors bg-white"
+                    >
+                      <span className="text-gray-500">
+                        {conditions.length === 0 ? 'Add conditions' : `${conditions.length} condition(s) added`}
+                      </span>
+                      <ChevronDown className="w-4 h-4 text-gray-400" />
+                    </button>
+                  </div>
+
+                  {/* Divider with OR */}
+                  <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                      <div className="w-full border-t border-gray-200"></div>
+                    </div>
+                    <div className="relative flex justify-center">
+                      <span className="px-3 bg-white text-xs font-medium text-gray-400">OR</span>
+                    </div>
+                  </div>
+
+                  {/* Target Groups */}
+                  <div className="relative">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Target Groups
+                    </label>
+                    <button
+                      onClick={() => setShowTargetGroups(!showTargetGroups)}
+                      className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors bg-white"
+                    >
+                      <span className="text-gray-500">
+                        {targetGroups.length === 0 ? 'Select target groups' : `${targetGroups.length} group(s) selected`}
+                      </span>
+                      <ChevronDown className="w-4 h-4 text-gray-400" />
+                    </button>
+
+                    {showTargetGroups && (
+                      <TargetGroupsDropdown
+                        selectedGroups={targetGroups}
+                        onSelectionChange={setTargetGroups}
+                        onClose={() => setShowTargetGroups(false)}
+                      />
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
           )}
 
-          {/* Conditions Field - For People and Applicants tabs */}
+          {/* Conditions and Target Groups Field - For People and Applicants tabs */}
           {activeTab !== 'templates' && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Conditions
-              </label>
-              <button
-                onClick={() => setShowConditionBuilder(true)}
-                className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                <span className="text-gray-500">
-                  {conditions.length === 0 ? 'Add conditions' : `${conditions.length} condition(s) added`}
-                </span>
-                <ChevronDown className="w-4 h-4 text-gray-400" />
-              </button>
-            </div>
+            <>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Conditions
+                </label>
+                <button
+                  onClick={() => setShowConditionBuilder(true)}
+                  className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  <span className="text-gray-500">
+                    {conditions.length === 0 ? 'Add conditions' : `${conditions.length} condition(s) added`}
+                  </span>
+                  <ChevronDown className="w-4 h-4 text-gray-400" />
+                </button>
+              </div>
+
+              {/* Target Groups Field */}
+              <div className="relative">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Target Groups
+                </label>
+                <button
+                  onClick={() => setShowTargetGroups(!showTargetGroups)}
+                  className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  <span className="text-gray-500">
+                    {targetGroups.length === 0 ? 'Select target groups' : `${targetGroups.length} group(s) selected`}
+                  </span>
+                  <ChevronDown className="w-4 h-4 text-gray-400" />
+                </button>
+
+                {showTargetGroups && (
+                  <TargetGroupsDropdown
+                    selectedGroups={targetGroups}
+                    onSelectionChange={setTargetGroups}
+                    onClose={() => setShowTargetGroups(false)}
+                  />
+                )}
+              </div>
+            </>
           )}
-
-          {/* Target Groups Field */}
-          <div className="relative">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Target Groups
-            </label>
-            <button
-              onClick={() => setShowTargetGroups(!showTargetGroups)}
-              className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              <span className="text-gray-500">
-                {targetGroups.length === 0 ? 'Select target groups' : `${targetGroups.length} group(s) selected`}
-              </span>
-              <ChevronDown className="w-4 h-4 text-gray-400" />
-            </button>
-
-            {/* Target Groups Dropdown */}
-            {showTargetGroups && (
-              <TargetGroupsDropdown
-                selectedGroups={targetGroups}
-                onSelectionChange={setTargetGroups}
-                onClose={() => setShowTargetGroups(false)}
-              />
-            )}
-          </div>
 
           {/* Enable Filter Toggle */}
           <div className="flex items-center justify-between">
