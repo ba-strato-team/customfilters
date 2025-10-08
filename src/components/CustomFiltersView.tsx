@@ -114,7 +114,7 @@ export const CustomFiltersView: React.FC<CustomFiltersViewProps> = ({ onBack }) 
               className="text-gray-600"
               title={groups.slice(2).join(', ')}
             >
-              +{remainingCount}More
+               +{remainingCount} MORE
             </span>
           )}
         </span>
@@ -134,13 +134,12 @@ export const CustomFiltersView: React.FC<CustomFiltersViewProps> = ({ onBack }) 
     if (docCount > 0) scopeParts.push(`${docCount} Document${docCount > 1 ? 's' : ''}`);
     if (workflowCount > 0) scopeParts.push(`${workflowCount} Workflow${workflowCount > 1 ? 's' : ''}`);
     
-    // For scope, we can show both parts if they fit, otherwise show first part +1More format
     const visibleParts = scopeParts.slice(0, 2);
     const remainingCount = scopeParts.length - visibleParts.length;
     
     let scopeText = visibleParts.join(', ');
     if (remainingCount > 0) {
-      scopeText += `+${remainingCount}More`;
+      scopeText += ` +${remainingCount} MORE`;
     }
     
     const fullDetails = [

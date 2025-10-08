@@ -14,8 +14,9 @@ export default function JobApplicationsView({ onGenerate }: JobApplicationsViewP
           <h1 className="text-2xl font-bold text-gray-900">Job Applications</h1>
         </div>
         <button
-          onClick={onGenerate}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          onClick={() => {}}
+          className="flex items-center gap-2 px-4 py-2 bg-gray-300 text-gray-500 rounded-lg cursor-not-allowed"
+          disabled
         >
           <Plus className="w-4 h-4" />
           Generate Application
@@ -29,8 +30,9 @@ export default function JobApplicationsView({ onGenerate }: JobApplicationsViewP
           Start by generating your first job application document.
         </p>
         <button
-          onClick={onGenerate}
-          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          onClick={() => {}}
+          className="px-6 py-2 bg-gray-300 text-gray-500 rounded-lg cursor-not-allowed"
+          disabled
         >
           Get Started
         </button>

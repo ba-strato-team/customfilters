@@ -56,15 +56,16 @@ function App() {
               return (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id as any)}
-                  className={`w-full flex items-center justify-between p-3 rounded-lg text-left transition-colors ${
+                  onClick={() => {}}
+                  className={`w-full flex items-center justify-between p-3 rounded-lg text-left cursor-not-allowed ${
                     isActive
-                      ? 'bg-blue-50 text-blue-700 border border-blue-200'
-                      : 'text-gray-700 hover:bg-gray-50'
+                      ? 'bg-gray-100 text-gray-400 border border-gray-200'
+                      : 'text-gray-400'
                   }`}
+                  disabled
                 >
                   <div className="flex items-center space-x-3">
-                    <IconComponent className={`w-5 h-5 ${isActive ? 'text-blue-600' : 'text-gray-500'}`} />
+                    <IconComponent className="w-5 h-5 text-gray-400" />
                     <span className="font-medium">{tab.label}</span>
                   </div>
                 </button>
@@ -78,13 +79,13 @@ function App() {
         <div className="p-4 border-t border-gray-200">
           <button
             onClick={() => setShowConfigDrawer(!showConfigDrawer)}
-            className={`w-full flex items-center space-x-3 p-3 rounded-lg transition-colors ${
+            className={`w-full flex items-center space-x-3 p-3 rounded-lg ${
               showConfigDrawer
-                ? 'bg-gray-100 text-gray-900'
+                ? 'bg-blue-50 text-blue-700'
                 : 'text-gray-700 hover:bg-gray-50'
             }`}
           >
-            <Settings className="w-5 h-5 text-gray-500" />
+            <Settings className={`w-5 h-5 ${showConfigDrawer ? 'text-blue-600' : 'text-gray-500'}`} />
             <span className="font-medium">Configurations</span>
           </button>
         </div>
