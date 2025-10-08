@@ -150,9 +150,8 @@ export const WorkforceView: React.FC<WorkforceViewProps> = ({ onGenerate }) => {
         </div>
         <div className="flex items-center space-x-3 ml-4">
           <button
-            onClick={() => {}}
-            className="flex items-center px-4 py-2 bg-gray-300 text-gray-500 rounded-lg cursor-not-allowed"
-            disabled
+            onClick={onGenerate}
+            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             <Plus className="w-4 h-4 mr-2" />
             Generate

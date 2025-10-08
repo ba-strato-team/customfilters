@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronLeft, Plus, MoreVertical, Info, CreditCard as Edit, Trash2, Users, FileText } from 'lucide-react';
+import { ChevronLeft, Plus, MoreVertical, Info, CreditCard as Edit, Trash2 } from 'lucide-react' FileText } from 'lucide-react';
 import { CreateCustomFilterPanel } from './CreateCustomFilterPanel';
 
 interface CustomFiltersViewProps {
