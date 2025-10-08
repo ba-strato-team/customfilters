@@ -144,7 +144,7 @@ export const CreateCustomFilterPanel: React.FC<CreateCustomFilterPanelProps> = (
           {/* Name Field */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Name <span className="text-red-500">*</span>
+              Name
             </label>
             <input
               type="text"
@@ -164,7 +164,7 @@ export const CreateCustomFilterPanel: React.FC<CreateCustomFilterPanelProps> = (
           {activeTab === 'templates' && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Filter Type <span className="text-red-500">*</span>
+                Filter Type
               </label>
               <div className="flex space-x-1 bg-gray-100 rounded-lg p-1">
                 <button
@@ -199,7 +199,7 @@ export const CreateCustomFilterPanel: React.FC<CreateCustomFilterPanelProps> = (
                   <Info className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
                   <div>
                     <label className="block text-sm font-medium text-gray-900 mb-1">
-                      Filter Criteria (at least one required) <span className="text-red-500">*</span>
+                      Filter Criteria (at least one required)
                     </label>
                     <p className="text-xs text-gray-600">
                       Fill at least one of the fields below to create a valid filter.
@@ -294,7 +294,7 @@ export const CreateCustomFilterPanel: React.FC<CreateCustomFilterPanelProps> = (
           {/* Target Groups Field */}
           <div className="relative">
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Target Groups <span className="text-red-500">*</span>
+              Target Groups
             </label>
             <button
               onClick={() => setShowTargetGroups(!showTargetGroups)}
