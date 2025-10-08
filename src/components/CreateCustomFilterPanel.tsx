@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, ChevronDown, Info } from 'lucide-react';
 import { ConditionBuilderModal } from './ConditionBuilderModal';
 import { TargetGroupsDropdown } from './TargetGroupsDropdown';
+import { SmartDropdown } from './SmartDropdown';
 
 interface CreateCustomFilterPanelProps {
   activeTab: 'people' | 'applicants' | 'templates';
@@ -190,32 +191,27 @@ export const CreateCustomFilterPanel: React.FC<CreateCustomFilterPanelProps> = (
                     <ChevronDown className="w-4 h-4 text-gray-400" />
                   </button>
 
-                  {showDocuments && (
-                    <>
-                      <div className="fixed inset-0 z-10" onClick={() => setShowDocuments(false)} />
-                      <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-20 max-h-64 overflow-y-auto">
-                        <div className="p-2">
-                          <div className="py-1">
-                            {availableDocuments.map((document) => (
-                              <button
-                                key={document}
-                                onClick={() => toggleDocument(document)}
-                                className="w-full flex items-center space-x-3 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded transition-colors"
-                              >
-                                <input
-                                  type="checkbox"
-                                  checked={selectedDocuments.includes(document)}
-                                  onChange={() => {}}
-                                  className="rounded border-gray-300"
-                                />
-                                <span>{document}</span>
-                              </button>
-                            ))}
-                          </div>
-                        </div>
+                  <SmartDropdown isOpen={showDocuments} onClose={() => setShowDocuments(false)}>
+                    <div className="p-2">
+                      <div className="py-1">
+                        {availableDocuments.map((document) => (
+                          <button
+                            key={document}
+                            onClick={() => toggleDocument(document)}
+                            className="w-full flex items-center space-x-3 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded transition-colors"
+                          >
+                            <input
+                              type="checkbox"
+                              checked={selectedDocuments.includes(document)}
+                              onChange={() => {}}
+                              className="rounded border-gray-300"
+                            />
+                            <span>{document}</span>
+                          </button>
+                        ))}
                       </div>
-                    </>
-                  )}
+                    </div>
+                  </SmartDropdown>
                 </div>
 
                 {/* Select Workflows */}
@@ -233,32 +229,27 @@ export const CreateCustomFilterPanel: React.FC<CreateCustomFilterPanelProps> = (
                     <ChevronDown className="w-4 h-4 text-gray-400" />
                   </button>
 
-                  {showWorkflows && (
-                    <>
-                      <div className="fixed inset-0 z-10" onClick={() => setShowWorkflows(false)} />
-                      <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-20 max-h-64 overflow-y-auto">
-                        <div className="p-2">
-                          <div className="py-1">
-                            {availableWorkflows.map((workflow) => (
-                              <button
-                                key={workflow}
-                                onClick={() => toggleWorkflow(workflow)}
-                                className="w-full flex items-center space-x-3 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded transition-colors"
-                              >
-                                <input
-                                  type="checkbox"
-                                  checked={selectedWorkflows.includes(workflow)}
-                                  onChange={() => {}}
-                                  className="rounded border-gray-300"
-                                />
-                                <span>{workflow}</span>
-                              </button>
-                            ))}
-                          </div>
-                        </div>
+                  <SmartDropdown isOpen={showWorkflows} onClose={() => setShowWorkflows(false)}>
+                    <div className="p-2">
+                      <div className="py-1">
+                        {availableWorkflows.map((workflow) => (
+                          <button
+                            key={workflow}
+                            onClick={() => toggleWorkflow(workflow)}
+                            className="w-full flex items-center space-x-3 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded transition-colors"
+                          >
+                            <input
+                              type="checkbox"
+                              checked={selectedWorkflows.includes(workflow)}
+                              onChange={() => {}}
+                              className="rounded border-gray-300"
+                            />
+                            <span>{workflow}</span>
+                          </button>
+                        ))}
                       </div>
-                    </>
-                  )}
+                    </div>
+                  </SmartDropdown>
                 </div>
 
                 {/* Conditions */}
