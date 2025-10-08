@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { X, ChevronDown, Info } from 'lucide-react';
-import { ConditionBuilderModal } from './ConditionBuilderModal';
 import { TargetGroupsDropdown } from './TargetGroupsDropdown';
 import { SmartDropdown } from './SmartDropdown';
 
@@ -19,10 +18,8 @@ export const CreateCustomFilterPanel: React.FC<CreateCustomFilterPanelProps> = (
   const [filterType, setFilterType] = useState<'people' | 'applicants'>('people');
   const [selectedDocuments, setSelectedDocuments] = useState<string[]>([]);
   const [selectedWorkflows, setSelectedWorkflows] = useState<string[]>([]);
-  const [conditions, setConditions] = useState<any[]>([]);
   const [targetGroups, setTargetGroups] = useState<string[]>([]);
   const [enabled, setEnabled] = useState(true);
-  const [showConditionBuilder, setShowConditionBuilder] = useState(false);
   const [showTargetGroups, setShowTargetGroups] = useState(false);
   const [showDocuments, setShowDocuments] = useState(false);
   const [showWorkflows, setShowWorkflows] = useState(false);
@@ -79,9 +76,9 @@ export const CreateCustomFilterPanel: React.FC<CreateCustomFilterPanelProps> = (
   const handleSave = () => {
     // Validation: Check if at least one filter criteria is filled for templates
     if (activeTab === 'templates') {
-      const hasFilterCriteria = selectedDocuments.length > 0 || selectedWorkflows.length > 0 || conditions.length > 0;
+      const hasFilterCriteria = selectedDocuments.length > 0 || selectedWorkflows.length > 0;
       if (!hasFilterCriteria) {
-        alert('Please fill at least one filter criteria field (Documents, Workflows, or Conditions)');
+        alert('Please fill at least one filter criteria field (Documents or Workflows)');
         return;
       }
     }
@@ -251,41 +248,7 @@ export const CreateCustomFilterPanel: React.FC<CreateCustomFilterPanelProps> = (
                     </div>
                   </SmartDropdown>
                 </div>
-
-                {/* Conditions */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Conditions
-                  </label>
-                  <button
-                    onClick={() => setShowConditionBuilder(true)}
-                    className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors bg-white"
-                  >
-                    <span className="text-gray-500">
-                      {conditions.length === 0 ? 'Add conditions' : `${conditions.length} condition(s) added`}
-                    </span>
-                    <ChevronDown className="w-4 h-4 text-gray-400" />
-                  </button>
-                </div>
               </div>
-            </div>
-          )}
-
-          {/* Conditions Field - For People and Applicants tabs */}
-          {activeTab !== 'templates' && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Conditions
-              </label>
-              <button
-                onClick={() => setShowConditionBuilder(true)}
-                className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                <span className="text-gray-500">
-                  {conditions.length === 0 ? 'Add conditions' : `${conditions.length} condition(s) added`}
-                </span>
-                <ChevronDown className="w-4 h-4 text-gray-400" />
-              </button>
             </div>
           )}
 
@@ -358,15 +321,6 @@ export const CreateCustomFilterPanel: React.FC<CreateCustomFilterPanelProps> = (
         </div>
       </div>
 
-      {/* Condition Builder Modal */}
-      {showConditionBuilder && (
-        <ConditionBuilderModal
-          conditions={conditions}
-          onConditionsChange={setConditions}
-          onClose={() => setShowConditionBuilder(false)}
-          filterType={activeTab === 'templates' ? filterType : activeTab}
-        />
-      )}
     </>
   );
 };
