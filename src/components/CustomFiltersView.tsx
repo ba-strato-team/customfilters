@@ -111,10 +111,10 @@ export const CustomFiltersView: React.FC<CustomFiltersViewProps> = ({ onBack }) 
           {visibleGroups.join(', ')}
           {remainingCount > 0 && (
             <span 
-              className="text-blue-600 cursor-pointer ml-1"
+              className="text-gray-600"
               title={groups.slice(2).join(', ')}
             >
-              + {remainingCount} More
+              +{remainingCount}More
             </span>
           )}
         </span>
@@ -130,10 +130,18 @@ export const CustomFiltersView: React.FC<CustomFiltersViewProps> = ({ onBack }) 
       return <span className="text-gray-400">None</span>;
     }
     
-    const scopeText = [
-      docCount > 0 ? `${docCount} Document${docCount > 1 ? 's' : ''}` : null,
-      workflowCount > 0 ? `${workflowCount} Workflow${workflowCount > 1 ? 's' : ''}` : null
-    ].filter(Boolean).join(', ');
+    const scopeParts = [];
+    if (docCount > 0) scopeParts.push(`${docCount} Document${docCount > 1 ? 's' : ''}`);
+    if (workflowCount > 0) scopeParts.push(`${workflowCount} Workflow${workflowCount > 1 ? 's' : ''}`);
+    
+    // For scope, we can show both parts if they fit, otherwise show first part +1More format
+    const visibleParts = scopeParts.slice(0, 2);
+    const remainingCount = scopeParts.length - visibleParts.length;
+    
+    let scopeText = visibleParts.join(', ');
+    if (remainingCount > 0) {
+      scopeText += `+${remainingCount}More`;
+    }
     
     const fullDetails = [
       ...(docCount > 0 ? [`Documents: ${documents.join(', ')}`] : []),
@@ -142,7 +150,7 @@ export const CustomFiltersView: React.FC<CustomFiltersViewProps> = ({ onBack }) 
     
     return (
       <span 
-        className="text-gray-600 cursor-help"
+        className="text-gray-600"
         title={fullDetails}
       >
         {scopeText}
@@ -251,7 +259,7 @@ export const CustomFiltersView: React.FC<CustomFiltersViewProps> = ({ onBack }) 
                     {currentFilters.map((filter) => (
                       <tr key={filter.id} className="hover:bg-gray-50 transition-colors">
                         <td className="py-4 px-4">
-                          <div className="font-medium text-gray-900 truncate max-w-48" title={filter.name}>
+                          <div className="font-medium text-gray-900 max-w-48" title={filter.name}>
                             {filter.name}
                           </div>
                         </td>
