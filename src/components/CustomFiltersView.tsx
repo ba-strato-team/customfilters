@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronLeft, Plus, MoreVertical, Info, CreditCard as Edit, Trash2 } from 'lucide-react' FileText } from 'lucide-react';
+import { ChevronLeft, Plus, MoreVertical, Info, CreditCard as Edit, Trash2, Users, FileText } from 'lucide-react';
 import { CreateCustomFilterPanel } from './CreateCustomFilterPanel';
 
 interface CustomFiltersViewProps {
@@ -25,19 +25,19 @@ export const CustomFiltersView: React.FC<CustomFiltersViewProps> = ({ onBack }) 
     people: [
       {
         id: '1',
-        name: 'Active Employees',
-        targetGroups: ['HR', 'Managers'],
+        name: 'Active Employees Filter',
+        targetGroups: ['HR', 'Managers', 'IT', 'Legal'],
         enabled: true
       },
       {
         id: '2',
-        name: 'Remote Workers',
+        name: 'Remote Workers Filter',
         targetGroups: ['All Users', 'IT', 'Engineering Team'],
         enabled: true
       },
       {
         id: '3',
-        name: 'New Hires (90 days)',
+        name: 'New Hires (90 days) Filter',
         targetGroups: ['HR', 'IT', 'Managers', 'Legal', 'Finance'],
         enabled: false
       }
@@ -45,13 +45,13 @@ export const CustomFiltersView: React.FC<CustomFiltersViewProps> = ({ onBack }) 
     applicants: [
       {
         id: '4',
-        name: 'Senior Level Candidates',
-        targetGroups: ['Recruiters', 'Hiring Managers'],
+        name: 'Senior Level Candidates Filter',
+        targetGroups: ['Recruiters', 'Hiring Managers', 'Engineering Team'],
         enabled: true
       },
       {
         id: '5',
-        name: 'Technical Interviews Pending',
+        name: 'Technical Interviews Pending Filter',
         targetGroups: ['Engineering Team', 'HR', 'Recruiters'],
         enabled: true
       }
@@ -59,7 +59,7 @@ export const CustomFiltersView: React.FC<CustomFiltersViewProps> = ({ onBack }) 
     templates: [
       {
         id: '6',
-        name: 'Contract Templates',
+        name: 'Contract Templates Filter',
         targetGroups: ['Legal', 'HR'],
         enabled: true,
         filterType: 'people',
@@ -68,7 +68,7 @@ export const CustomFiltersView: React.FC<CustomFiltersViewProps> = ({ onBack }) 
       },
       {
         id: '7',
-        name: 'Applicant Processing',
+        name: 'Applicant Processing Filter',
         targetGroups: ['Recruiters', 'Hiring Managers', 'HR', 'Legal'],
         enabled: false,
         filterType: 'applicants',
@@ -112,9 +112,9 @@ export const CustomFiltersView: React.FC<CustomFiltersViewProps> = ({ onBack }) 
           {remainingCount > 0 && (
             <span 
               className="text-gray-600"
-              title={groups.slice(2).join(', ')}
+              title={`Full list: ${groups.join(', ')}`}
             >
-               +{remainingCount} MORE
+               +{remainingCount} More
             </span>
           )}
         </span>
@@ -130,16 +130,13 @@ export const CustomFiltersView: React.FC<CustomFiltersViewProps> = ({ onBack }) 
       return <span className="text-gray-400">None</span>;
     }
     
-    const scopeParts = [];
-    if (docCount > 0) scopeParts.push(`${docCount} Document${docCount > 1 ? 's' : ''}`);
-    if (workflowCount > 0) scopeParts.push(`${workflowCount} Workflow${workflowCount > 1 ? 's' : ''}`);
-    
-    const visibleParts = scopeParts.slice(0, 2);
-    const remainingCount = scopeParts.length - visibleParts.length;
-    
-    let scopeText = visibleParts.join(', ');
-    if (remainingCount > 0) {
-      scopeText += ` +${remainingCount} MORE`;
+    let scopeText = '';
+    if (docCount > 0 && workflowCount > 0) {
+      scopeText = `${docCount} Document${docCount > 1 ? 's' : ''}, ${workflowCount} Workflow${workflowCount > 1 ? 's' : ''}`;
+    } else if (docCount > 0) {
+      scopeText = `${docCount} Document${docCount > 1 ? 's' : ''}`;
+    } else if (workflowCount > 0) {
+      scopeText = `${workflowCount} Workflow${workflowCount > 1 ? 's' : ''}`;
     }
     
     const fullDetails = [
@@ -239,18 +236,18 @@ export const CustomFiltersView: React.FC<CustomFiltersViewProps> = ({ onBack }) 
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="w-full min-w-full">
+                <table className="w-full">
                   <thead>
                     <tr className="border-b border-gray-200 bg-gray-50">
-                      <th className="text-left py-3 px-4 font-medium text-gray-900 min-w-48">Name</th>
+                      <th className="text-left py-3 px-4 font-medium text-gray-900 w-1/3">Name</th>
                       {activeTab === 'templates' && (
                         <>
-                          <th className="text-left py-3 px-4 font-medium text-gray-900 min-w-32">Filter Type</th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-900 min-w-40">Scope</th>
+                          <th className="text-left py-3 px-4 font-medium text-gray-900 w-32">Filter Type</th>
+                          <th className="text-left py-3 px-4 font-medium text-gray-900 w-40">Scope</th>
                         </>
                       )}
-                      <th className="text-left py-3 px-4 font-medium text-gray-900 min-w-48">Assigned Groups</th>
-                      <th className="text-left py-3 px-4 font-medium text-gray-900 min-w-24">Status</th>
+                      <th className="text-left py-3 px-4 font-medium text-gray-900">Assigned Groups</th>
+                      <th className="text-left py-3 px-4 font-medium text-gray-900 w-24">Status</th>
                       <th className="w-12"></th>
                     </tr>
                   </thead>
@@ -258,7 +255,7 @@ export const CustomFiltersView: React.FC<CustomFiltersViewProps> = ({ onBack }) 
                     {currentFilters.map((filter) => (
                       <tr key={filter.id} className="hover:bg-gray-50 transition-colors">
                         <td className="py-4 px-4">
-                          <div className="font-medium text-gray-900 max-w-48" title={filter.name}>
+                          <div className="font-medium text-gray-900" title={filter.name}>
                             {filter.name}
                           </div>
                         </td>
@@ -282,7 +279,7 @@ export const CustomFiltersView: React.FC<CustomFiltersViewProps> = ({ onBack }) 
                           </>
                         )}
                         <td className="py-4 px-4">
-                          {renderAssignedGroups(filter.targetGroups)}
+                          {renderAssignedGroups(filter.targetGroups, 'max-w-64')}
                         </td>
                         <td className="py-4 px-4">
                           {renderStatusToggle(filter)}
