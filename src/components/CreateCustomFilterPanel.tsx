@@ -172,7 +172,10 @@ export const CreateCustomFilterPanel: React.FC<CreateCustomFilterPanelProps> = (
               </label>
               <div className="flex space-x-1 bg-gray-100 rounded-lg p-1">
                 <button
-                  onClick={() => setFilterType('people')}
+                  onClick={() => {
+                    setFilterType('people');
+                    setConditions([]);
+                  }}
                   className={`flex-1 px-3 py-2 text-sm rounded-md transition-colors ${
                     filterType === 'people'
                       ? 'bg-white text-gray-900 shadow-sm'
@@ -295,8 +298,8 @@ export const CreateCustomFilterPanel: React.FC<CreateCustomFilterPanelProps> = (
             </div>
           )}
 
-          {/* Conditions Field - For People and Applicants tabs */}
-          {activeTab !== 'templates' && (
+          {/* Conditions Field - For People and Applicants tabs, and Templates with Applicants filter type */}
+          {(activeTab !== 'templates' || (activeTab === 'templates' && filterType === 'applicants')) && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Conditions
