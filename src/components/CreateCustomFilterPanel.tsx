@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, ChevronDown, Info } from 'lucide-react';
 import { TargetGroupsDropdown } from './TargetGroupsDropdown';
 import { SmartDropdown } from './SmartDropdown';
+import { ConditionBuilderModal } from './ConditionBuilderModal';
 
 interface FilterData {
   id?: string;
@@ -36,9 +37,11 @@ export const CreateCustomFilterPanel: React.FC<CreateCustomFilterPanelProps> = (
   const [selectedWorkflows, setSelectedWorkflows] = useState<string[]>([]);
   const [targetGroups, setTargetGroups] = useState<string[]>([]);
   const [enabled, setEnabled] = useState(false);
+  const [conditions, setConditions] = useState<any[]>([]);
   const [showTargetGroups, setShowTargetGroups] = useState(false);
   const [showDocuments, setShowDocuments] = useState(false);
   const [showWorkflows, setShowWorkflows] = useState(false);
+  const [showConditionBuilder, setShowConditionBuilder] = useState(false);
 
   useEffect(() => {
     if (initialData) {
@@ -48,6 +51,7 @@ export const CreateCustomFilterPanel: React.FC<CreateCustomFilterPanelProps> = (
       setSelectedWorkflows(initialData.selectedWorkflows || []);
       setTargetGroups(initialData.targetGroups || []);
       setEnabled(initialData.enabled);
+      setConditions([]);
     }
   }, [initialData]);
 
@@ -291,6 +295,24 @@ export const CreateCustomFilterPanel: React.FC<CreateCustomFilterPanelProps> = (
             </div>
           )}
 
+          {/* Conditions Field - For People and Applicants tabs */}
+          {activeTab !== 'templates' && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Conditions
+              </label>
+              <button
+                onClick={() => setShowConditionBuilder(true)}
+                className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                <span className="text-gray-500">
+                  {conditions.length === 0 ? 'Add conditions' : `${conditions.length} condition(s) added`}
+                </span>
+                <ChevronDown className="w-4 h-4 text-gray-400" />
+              </button>
+            </div>
+          )}
+
           {/* Target Groups Field */}
           <div className="relative">
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -365,6 +387,15 @@ export const CreateCustomFilterPanel: React.FC<CreateCustomFilterPanelProps> = (
         </div>
       </div>
 
+      {/* Condition Builder Modal */}
+      {showConditionBuilder && (
+        <ConditionBuilderModal
+          conditions={conditions}
+          onConditionsChange={setConditions}
+          onClose={() => setShowConditionBuilder(false)}
+          filterType={activeTab === 'templates' ? filterType : activeTab}
+        />
+      )}
     </>
   );
 };
