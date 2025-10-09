@@ -202,20 +202,18 @@ export const CreateCustomFilterPanel: React.FC<CreateCustomFilterPanelProps> = (
           {activeTab === 'templates' && (
             <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
               <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-900 mb-1">
+                  Filter Criteria (at least one required)
+                </label>
                 <div className="flex items-start space-x-2">
                   <Info className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
-                  <div>
-                    <label className="block text-sm font-medium text-gray-900 mb-1">
-                      Filter Criteria (at least one required)
-                    </label>
-                    <p className="text-xs text-gray-600">
-                      Fill at least one of the fields below to create a valid filter.
-                    </p>
-                    {validationErrors.filterCriteria && (
-                      <p className="text-xs text-red-600 mt-1">Select at least one document or workflow</p>
-                    )}
-                  </div>
+                  <p className="text-xs text-gray-600">
+                    Fill in at least one of the fields below to create a valid filter.
+                  </p>
                 </div>
+                {validationErrors.filterCriteria && (
+                  <p className="text-xs text-red-600 mt-1">Select at least one document or workflow</p>
+                )}
               </div>
 
               <div className="space-y-4">
