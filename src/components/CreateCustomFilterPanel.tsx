@@ -1,59 +1,31 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { X, ChevronDown, Info } from 'lucide-react';
+import { ConditionBuilderModal } from './ConditionBuilderModal';
 import { TargetGroupsDropdown } from './TargetGroupsDropdown';
 import { SmartDropdown } from './SmartDropdown';
-import { ConditionBuilderModal } from './ConditionBuilderModal';
-
-interface FilterData {
-  id?: string;
-  name: string;
-  filterType: 'people' | 'applicants';
-  selectedDocuments: string[];
-  selectedWorkflows: string[];
-  targetGroups: string[];
-  enabled: boolean;
-}
 
 interface CreateCustomFilterPanelProps {
   activeTab: 'people' | 'applicants' | 'templates';
   onClose: () => void;
-  onSave: (data: FilterData) => void;
-  editMode?: boolean;
-  initialData?: FilterData;
-  validationErrors?: { [key: string]: boolean };
+  onSave: () => void;
 }
 
 export const CreateCustomFilterPanel: React.FC<CreateCustomFilterPanelProps> = ({
   activeTab,
   onClose,
-  onSave,
-  editMode = false,
-  initialData,
-  validationErrors = {}
+  onSave
 }) => {
   const [name, setName] = useState('');
   const [filterType, setFilterType] = useState<'people' | 'applicants'>('people');
   const [selectedDocuments, setSelectedDocuments] = useState<string[]>([]);
   const [selectedWorkflows, setSelectedWorkflows] = useState<string[]>([]);
-  const [targetGroups, setTargetGroups] = useState<string[]>([]);
-  const [enabled, setEnabled] = useState(false);
   const [conditions, setConditions] = useState<any[]>([]);
+  const [targetGroups, setTargetGroups] = useState<string[]>([]);
+  const [enabled, setEnabled] = useState(true);
+  const [showConditionBuilder, setShowConditionBuilder] = useState(false);
   const [showTargetGroups, setShowTargetGroups] = useState(false);
   const [showDocuments, setShowDocuments] = useState(false);
   const [showWorkflows, setShowWorkflows] = useState(false);
-  const [showConditionBuilder, setShowConditionBuilder] = useState(false);
-
-  useEffect(() => {
-    if (initialData) {
-      setName(initialData.name);
-      setFilterType(initialData.filterType);
-      setSelectedDocuments(initialData.selectedDocuments || []);
-      setSelectedWorkflows(initialData.selectedWorkflows || []);
-      setTargetGroups(initialData.targetGroups || []);
-      setEnabled(initialData.enabled);
-      setConditions([]);
-    }
-  }, [initialData]);
 
   const availableDocuments = [
     'Annual Performance Review',
@@ -105,26 +77,22 @@ export const CreateCustomFilterPanel: React.FC<CreateCustomFilterPanelProps> = (
     }
   };
   const handleSave = () => {
-    const filterData: FilterData = {
-      ...(initialData?.id && { id: initialData.id }),
-      name,
-      filterType,
-      selectedDocuments,
-      selectedWorkflows,
-      targetGroups,
-      enabled
-    };
-
-    onSave(filterData);
-  };
-
-  const isValid = () => {
-    if (!name.trim()) return false;
-    if (targetGroups.length === 0) return false;
+    // Validation: Check if at least one filter criteria is filled for templates
     if (activeTab === 'templates') {
-      return selectedDocuments.length > 0 || selectedWorkflows.length > 0;
+      const hasFilterCriteria = selectedDocuments.length > 0 || selectedWorkflows.length > 0 || conditions.length > 0;
+      if (!hasFilterCriteria) {
+        alert('Please fill at least one filter criteria field (Documents, Workflows, or Conditions)');
+        return;
+      }
     }
-    return true;
+
+    // Check if target groups are selected
+    if (targetGroups.length === 0) {
+      alert('Please select at least one target group');
+      return;
+    }
+
+    onSave();
   };
 
   return (
@@ -133,7 +101,7 @@ export const CreateCustomFilterPanel: React.FC<CreateCustomFilterPanelProps> = (
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <h2 className="text-lg font-semibold text-gray-900">
-            {editMode ? 'Edit' : 'Create'} Custom Filter for {getTabLabel()}
+            Create Custom Filter for {getTabLabel()}
           </h2>
           <button
             onClick={onClose}
@@ -155,13 +123,8 @@ export const CreateCustomFilterPanel: React.FC<CreateCustomFilterPanelProps> = (
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Enter filter name"
-              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                validationErrors.name ? 'border-red-500 bg-red-50' : 'border-gray-300'
-              }`}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
-            {validationErrors.name && (
-              <p className="mt-1 text-xs text-red-600">Name is required</p>
-            )}
           </div>
 
           {/* Filter Type Field - Only for Templates */}
@@ -208,9 +171,6 @@ export const CreateCustomFilterPanel: React.FC<CreateCustomFilterPanelProps> = (
                     <p className="text-xs text-gray-600">
                       Fill at least one of the fields below to create a valid filter.
                     </p>
-                    {validationErrors.filterCriteria && (
-                      <p className="text-xs text-red-600 mt-1">Select at least one document or workflow</p>
-                    )}
                   </div>
                 </div>
               </div>
@@ -291,6 +251,22 @@ export const CreateCustomFilterPanel: React.FC<CreateCustomFilterPanelProps> = (
                     </div>
                   </SmartDropdown>
                 </div>
+
+                {/* Conditions */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Conditions
+                  </label>
+                  <button
+                    onClick={() => setShowConditionBuilder(true)}
+                    className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors bg-white"
+                  >
+                    <span className="text-gray-500">
+                      {conditions.length === 0 ? 'Add conditions' : `${conditions.length} condition(s) added`}
+                    </span>
+                    <ChevronDown className="w-4 h-4 text-gray-400" />
+                  </button>
+                </div>
               </div>
             </div>
           )}
@@ -320,18 +296,13 @@ export const CreateCustomFilterPanel: React.FC<CreateCustomFilterPanelProps> = (
             </label>
             <button
               onClick={() => setShowTargetGroups(!showTargetGroups)}
-              className={`w-full flex items-center justify-between px-3 py-2 border rounded-lg hover:bg-gray-50 transition-colors ${
-                validationErrors.targetGroups ? 'border-red-500 bg-red-50' : 'border-gray-300'
-              }`}
+              className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
             >
               <span className="text-gray-500">
                 {targetGroups.length === 0 ? 'Select target groups' : `${targetGroups.length} group(s) selected`}
               </span>
               <ChevronDown className="w-4 h-4 text-gray-400" />
             </button>
-            {validationErrors.targetGroups && (
-              <p className="mt-1 text-xs text-red-600">Select at least one target group</p>
-            )}
 
             {/* Target Groups Dropdown */}
             {showTargetGroups && (
@@ -374,14 +345,14 @@ export const CreateCustomFilterPanel: React.FC<CreateCustomFilterPanelProps> = (
             </button>
             <button
               onClick={handleSave}
-              disabled={!isValid()}
+              disabled={!name.trim() || (activeTab === 'templates' && filterType ? false : false)}
               className={`px-6 py-2 rounded-lg font-medium transition-colors ${
-                isValid()
+                name.trim()
                   ? 'bg-blue-600 text-white hover:bg-blue-700'
                   : 'bg-gray-300 text-gray-500 cursor-not-allowed'
               }`}
             >
-              {editMode ? 'Update' : 'Create'}
+              Create
             </button>
           </div>
         </div>

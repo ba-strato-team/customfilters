@@ -1,9 +1,6 @@
 import React, { useState } from 'react';
 import { ChevronLeft, Plus, MoreVertical, Info, Edit, Trash2, ChevronLeft as ChevronLeftIcon, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { CreateCustomFilterPanel } from './CreateCustomFilterPanel';
-import { FilterInfoPanel } from './FilterInfoPanel';
-import { DeleteConfirmationDialog } from './DeleteConfirmationDialog';
-import { ToastContainer } from './Toast';
 
 interface CustomFiltersViewProps {
   onBack: () => void;
@@ -19,29 +16,16 @@ interface Filter {
   filterType?: 'people' | 'applicants';
   documentsCount?: number;
   workflowsCount?: number;
-  selectedDocuments?: string[];
-  selectedWorkflows?: string[];
-}
-
-interface Toast {
-  id: string;
-  message: string;
-  type: 'success' | 'error' | 'neutral';
 }
 
 export const CustomFiltersView: React.FC<CustomFiltersViewProps> = ({ onBack }) => {
   const [activeTab, setActiveTab] = useState<'people' | 'applicants' | 'templates'>('people');
   const [showCreatePanel, setShowCreatePanel] = useState(false);
-  const [editingFilter, setEditingFilter] = useState<Filter | null>(null);
-  const [viewingFilter, setViewingFilter] = useState<Filter | null>(null);
-  const [deletingFilter, setDeletingFilter] = useState<Filter | null>(null);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [toasts, setToasts] = useState<Toast[]>([]);
-  const [validationErrors, setValidationErrors] = useState<{ [key: string]: boolean }>({});
   const itemsPerPage = 10;
 
-  const [filters, setFilters] = useState<Record<string, Filter[]>>({
+  const mockFilters: Record<string, Filter[]> = {
     people: [
       {
         id: '1',
@@ -49,9 +33,7 @@ export const CustomFiltersView: React.FC<CustomFiltersViewProps> = ({ onBack }) 
         conditions: 3,
         targetGroups: ['HR', 'Managers'],
         enabled: true,
-        lastModified: '2 days ago',
-        selectedDocuments: [],
-        selectedWorkflows: []
+        lastModified: '2 days ago'
       },
       {
         id: '2',
@@ -59,9 +41,7 @@ export const CustomFiltersView: React.FC<CustomFiltersViewProps> = ({ onBack }) 
         conditions: 2,
         targetGroups: ['All Users'],
         enabled: true,
-        lastModified: '1 week ago',
-        selectedDocuments: [],
-        selectedWorkflows: []
+        lastModified: '1 week ago'
       },
       {
         id: '3',
@@ -69,9 +49,7 @@ export const CustomFiltersView: React.FC<CustomFiltersViewProps> = ({ onBack }) 
         conditions: 4,
         targetGroups: ['HR', 'IT', 'Operations', 'Finance'],
         enabled: false,
-        lastModified: '3 days ago',
-        selectedDocuments: [],
-        selectedWorkflows: []
+        lastModified: '3 days ago'
       }
     ],
     applicants: [
@@ -81,9 +59,7 @@ export const CustomFiltersView: React.FC<CustomFiltersViewProps> = ({ onBack }) 
         conditions: 5,
         targetGroups: ['Recruiters', 'Hiring Managers', 'Department Heads'],
         enabled: true,
-        lastModified: '1 day ago',
-        selectedDocuments: [],
-        selectedWorkflows: []
+        lastModified: '1 day ago'
       },
       {
         id: '5',
@@ -91,9 +67,7 @@ export const CustomFiltersView: React.FC<CustomFiltersViewProps> = ({ onBack }) 
         conditions: 2,
         targetGroups: ['Engineering Team'],
         enabled: true,
-        lastModified: '4 days ago',
-        selectedDocuments: [],
-        selectedWorkflows: []
+        lastModified: '4 days ago'
       }
     ],
     templates: [
@@ -106,9 +80,7 @@ export const CustomFiltersView: React.FC<CustomFiltersViewProps> = ({ onBack }) 
         lastModified: '1 week ago',
         filterType: 'people',
         documentsCount: 3,
-        workflowsCount: 2,
-        selectedDocuments: ['Form', 'Leave Form', 'Offer Letter Template'],
-        selectedWorkflows: ['Onboarding Workflow', 'Performance Review Process']
+        workflowsCount: 2
       },
       {
         id: '7',
@@ -119,153 +91,26 @@ export const CustomFiltersView: React.FC<CustomFiltersViewProps> = ({ onBack }) 
         lastModified: '3 days ago',
         filterType: 'applicants',
         documentsCount: 5,
-        workflowsCount: 3,
-        selectedDocuments: ['Annual Performance Review', 'Certificate of Employment', 'Exit Documents', 'Employee Handbook', 'Non-Disclosure Agreement'],
-        selectedWorkflows: ['Training Enrollment', 'Benefits Setup', 'Equipment Assignment']
+        workflowsCount: 3
       }
     ]
-  });
+  };
 
-  const allFilters = filters[activeTab] || [];
+  const allFilters = mockFilters[activeTab] || [];
   const totalPages = Math.ceil(allFilters.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const currentFilters = allFilters.slice(startIndex, endIndex);
 
-  const addToast = (message: string, type: 'success' | 'error' | 'neutral') => {
-    const id = Date.now().toString();
-    setToasts(prev => [...prev, { id, message, type }]);
-  };
-
-  const removeToast = (id: string) => {
-    setToasts(prev => prev.filter(toast => toast.id !== id));
-  };
-
   const toggleFilterEnabled = (filterId: string) => {
-    setFilters(prev => ({
-      ...prev,
-      [activeTab]: prev[activeTab].map(filter =>
-        filter.id === filterId ? { ...filter, enabled: !filter.enabled } : filter
-      )
-    }));
-  };
-
-  const handleCreateFilter = () => {
-    setShowCreatePanel(true);
-    setEditingFilter(null);
-    setValidationErrors({});
-  };
-
-  const handleEditFilter = (filter: Filter) => {
-    setEditingFilter(filter);
-    setShowCreatePanel(true);
-    setActiveDropdown(null);
-    setValidationErrors({});
-  };
-
-  const handleViewInfo = (filter: Filter) => {
-    setViewingFilter(filter);
-    setActiveDropdown(null);
-  };
-
-  const handleDeleteClick = (filter: Filter) => {
-    setDeletingFilter(filter);
-    setActiveDropdown(null);
-  };
-
-  const handleSaveFilter = (filterData: any) => {
-    const errors: { [key: string]: boolean } = {};
-
-    if (!filterData.name.trim()) {
-      errors.name = true;
-    }
-
-    if (filterData.targetGroups.length === 0) {
-      errors.targetGroups = true;
-    }
-
-    if (activeTab === 'templates' && filterData.selectedDocuments.length === 0 && filterData.selectedWorkflows.length === 0) {
-      errors.filterCriteria = true;
-    }
-
-    if (Object.keys(errors).length > 0) {
-      setValidationErrors(errors);
-      addToast('Please complete all required fields before saving.', 'error');
-      return;
-    }
-
-    if (editingFilter) {
-      setFilters(prev => ({
-        ...prev,
-        [activeTab]: prev[activeTab].map(filter =>
-          filter.id === editingFilter.id
-            ? {
-                ...filter,
-                name: filterData.name,
-                filterType: filterData.filterType,
-                selectedDocuments: filterData.selectedDocuments,
-                selectedWorkflows: filterData.selectedWorkflows,
-                targetGroups: filterData.targetGroups,
-                enabled: filterData.enabled,
-                documentsCount: filterData.selectedDocuments.length,
-                workflowsCount: filterData.selectedWorkflows.length,
-                lastModified: 'Just now'
-              }
-            : filter
-        )
-      }));
-      addToast('Custom filter updated successfully.', 'success');
-    } else {
-      const newFilter: Filter = {
-        id: Date.now().toString(),
-        name: filterData.name,
-        conditions: 0,
-        targetGroups: filterData.targetGroups,
-        enabled: filterData.enabled,
-        lastModified: 'Just now',
-        filterType: filterData.filterType,
-        documentsCount: filterData.selectedDocuments.length,
-        workflowsCount: filterData.selectedWorkflows.length,
-        selectedDocuments: filterData.selectedDocuments,
-        selectedWorkflows: filterData.selectedWorkflows
-      };
-
-      setFilters(prev => ({
-        ...prev,
-        [activeTab]: [...prev[activeTab], newFilter]
-      }));
-      addToast('Custom filter created successfully.', 'success');
-    }
-
-    setShowCreatePanel(false);
-    setEditingFilter(null);
-    setValidationErrors({});
-  };
-
-  const handleCancelFilter = () => {
-    setShowCreatePanel(false);
-    setEditingFilter(null);
-    setValidationErrors({});
-
-    if (editingFilter) {
-      addToast('Changes discarded.', 'neutral');
-    }
-  };
-
-  const handleConfirmDelete = () => {
-    if (deletingFilter) {
-      setFilters(prev => ({
-        ...prev,
-        [activeTab]: prev[activeTab].filter(filter => filter.id !== deletingFilter.id)
-      }));
-      addToast('Custom filter deleted successfully.', 'success');
-      setDeletingFilter(null);
-    }
+    // Toggle logic will be implemented with actual state management
+    console.log('Toggle filter:', filterId);
   };
 
   const renderAssignedGroups = (groups: string[]) => {
     if (groups.length === 0) return <span className="text-gray-400">No groups</span>;
 
+    // For simplicity, show first 2 groups and count remainder
     const visibleGroups = groups.slice(0, 2);
     const remainingCount = groups.length - visibleGroups.length;
 
@@ -291,6 +136,10 @@ export const CustomFiltersView: React.FC<CustomFiltersViewProps> = ({ onBack }) 
     setActiveDropdown(activeDropdown === filterId ? null : filterId);
   };
 
+  const handleCreateFilter = () => {
+    setShowCreatePanel(true);
+  };
+
   const handleTabChange = (tab: 'people' | 'applicants' | 'templates') => {
     setActiveTab(tab);
     setCurrentPage(1);
@@ -298,8 +147,10 @@ export const CustomFiltersView: React.FC<CustomFiltersViewProps> = ({ onBack }) 
 
   return (
     <div className="flex h-full">
-      <div className={`flex-1 bg-gray-50 transition-all duration-300 ${showCreatePanel || viewingFilter ? 'mr-96' : ''}`}>
+      {/* Main Content */}
+      <div className={`flex-1 bg-gray-50 transition-all duration-300 ${showCreatePanel ? 'mr-96' : ''}`}>
         <div className="p-6">
+          {/* Header */}
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center space-x-4">
               <button
@@ -319,6 +170,7 @@ export const CustomFiltersView: React.FC<CustomFiltersViewProps> = ({ onBack }) 
             </button>
           </div>
 
+          {/* Tab Navigation */}
           <div className="border-b border-gray-200 mb-6">
             <nav className="flex space-x-8">
               {tabs.map((tab) => (
@@ -337,6 +189,7 @@ export const CustomFiltersView: React.FC<CustomFiltersViewProps> = ({ onBack }) 
             </nav>
           </div>
 
+          {/* Filters List */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200">
             {allFilters.length === 0 ? (
               <div className="p-8 text-center">
@@ -358,6 +211,7 @@ export const CustomFiltersView: React.FC<CustomFiltersViewProps> = ({ onBack }) 
               </div>
             ) : (
               <>
+                {/* Table */}
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead className="bg-gray-50 border-b border-gray-200">
@@ -433,24 +287,15 @@ export const CustomFiltersView: React.FC<CustomFiltersViewProps> = ({ onBack }) 
                               {activeDropdown === filter.id && (
                                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-20">
                                   <div className="py-1">
-                                    <button
-                                      onClick={() => handleViewInfo(filter)}
-                                      className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                                    >
+                                    <button className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                                       <Info className="w-4 h-4" />
                                       <span>View Info</span>
                                     </button>
-                                    <button
-                                      onClick={() => handleEditFilter(filter)}
-                                      className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                                    >
+                                    <button className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                                       <Edit className="w-4 h-4" />
                                       <span>Edit</span>
                                     </button>
-                                    <button
-                                      onClick={() => handleDeleteClick(filter)}
-                                      className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
-                                    >
+                                    <button className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50">
                                       <Trash2 className="w-4 h-4" />
                                       <span>Delete</span>
                                     </button>
@@ -465,6 +310,7 @@ export const CustomFiltersView: React.FC<CustomFiltersViewProps> = ({ onBack }) 
                   </table>
                 </div>
 
+                {/* Pagination */}
                 {totalPages > 1 && (
                   <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
                     <div className="flex items-center space-x-2">
@@ -522,57 +368,25 @@ export const CustomFiltersView: React.FC<CustomFiltersViewProps> = ({ onBack }) 
         </div>
       </div>
 
+      {/* Create Filter Panel */}
       {showCreatePanel && (
         <CreateCustomFilterPanel
           activeTab={activeTab}
-          onClose={handleCancelFilter}
-          onSave={handleSaveFilter}
-          editMode={!!editingFilter}
-          initialData={editingFilter ? {
-            id: editingFilter.id,
-            name: editingFilter.name,
-            filterType: editingFilter.filterType || 'people',
-            selectedDocuments: editingFilter.selectedDocuments || [],
-            selectedWorkflows: editingFilter.selectedWorkflows || [],
-            targetGroups: editingFilter.targetGroups,
-            enabled: editingFilter.enabled
-          } : undefined}
-          validationErrors={validationErrors}
-        />
-      )}
-
-      {viewingFilter && (
-        <FilterInfoPanel
-          filter={{
-            name: viewingFilter.name,
-            filterType: viewingFilter.filterType,
-            selectedDocuments: viewingFilter.selectedDocuments,
-            selectedWorkflows: viewingFilter.selectedWorkflows,
-            targetGroups: viewingFilter.targetGroups,
-            enabled: viewingFilter.enabled
+          onClose={() => setShowCreatePanel(false)}
+          onSave={() => {
+            setShowCreatePanel(false);
+            // Handle save logic here
           }}
-          onClose={() => setViewingFilter(null)}
-          isTemplates={activeTab === 'templates'}
         />
       )}
 
-      {deletingFilter && (
-        <DeleteConfirmationDialog
-          title="Delete Custom Filter"
-          message="Are you sure you want to delete this custom filter? This action cannot be undone."
-          onConfirm={handleConfirmDelete}
-          onCancel={() => setDeletingFilter(null)}
-        />
-      )}
-
+      {/* Backdrop for dropdown */}
       {activeDropdown && (
         <div
           className="fixed inset-0 z-5"
           onClick={() => setActiveDropdown(null)}
         />
       )}
-
-      <ToastContainer toasts={toasts} onRemoveToast={removeToast} />
     </div>
   );
 };
