@@ -172,10 +172,7 @@ export const CreateCustomFilterPanel: React.FC<CreateCustomFilterPanelProps> = (
               </label>
               <div className="flex space-x-1 bg-gray-100 rounded-lg p-1">
                 <button
-                  onClick={() => {
-                    setFilterType('people');
-                    setConditions([]);
-                  }}
+                  onClick={() => setFilterType('people')}
                   className={`flex-1 px-3 py-2 text-sm rounded-md transition-colors ${
                     filterType === 'people'
                       ? 'bg-white text-gray-900 shadow-sm'
@@ -296,23 +293,21 @@ export const CreateCustomFilterPanel: React.FC<CreateCustomFilterPanelProps> = (
             </div>
           )}
 
-          {/* Conditions Field - For People and Applicants tabs, and Templates with Applicants filter type */}
-          {(activeTab !== 'templates' || (activeTab === 'templates' && filterType === 'applicants')) && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Conditions
-              </label>
-              <button
-                onClick={() => setShowConditionBuilder(true)}
-                className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                <span className="text-gray-500">
-                  {conditions.length === 0 ? 'Add conditions' : `${conditions.length} condition(s) added`}
-                </span>
-                <ChevronDown className="w-4 h-4 text-gray-400" />
-              </button>
-            </div>
-          )}
+          {/* Conditions Field - For all tabs and filter types */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Conditions
+            </label>
+            <button
+              onClick={() => setShowConditionBuilder(true)}
+              className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              <span className="text-gray-500">
+                {conditions.length === 0 ? 'Add conditions' : `${conditions.length} condition(s) added`}
+              </span>
+              <ChevronDown className="w-4 h-4 text-gray-400" />
+            </button>
+          </div>
 
           {/* Target Groups Field */}
           <div className="relative">
